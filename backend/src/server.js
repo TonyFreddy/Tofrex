@@ -1,5 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const { connectDB } = require("./lib/db");
 const path = require('path');
 const authRoutes = require("./routes/auth.route");
 const messageRoutes = require("./routes/message.route");
@@ -17,7 +18,10 @@ if (process.env.NODE_ENV === "production") {
     
     app.get("*", (req, res) => {
         res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
-    });
+    }); 
 }
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log("Server running on port:", PORT);
+  connectDB();
+});
