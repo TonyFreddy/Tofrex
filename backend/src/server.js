@@ -1,22 +1,16 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const authRoutes = require("./routes/auth.route");
+
 
 dotenv.config();
 
 const app = express();
 
-console.log(process.env.PORT);
+const PORT = process.env.PORT || 3000
 
-app.get("/api/auth/signup", (req, res) => {
-    res.send("Signup endpoint");
-});
+app.use("/api/auth" , authRoutes);
 
-app.get("/api/auth/login", (req, res) => {
-    res.send("Login endpoint");
-});
 
-app.get("/api/auth/logout", (req, res) => {
-    res.send("Logout endpoint");
-});
 
 app.listen(process.env.PORT, () => console.log(`Server running on port ${process.env.PORT}`));
