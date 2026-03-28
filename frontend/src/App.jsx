@@ -1,121 +1,81 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
-
+import { Navigate, Route, Routes } from "react-router";
+import ChatPage from "./pages/ChatPage";
+import LoginPage from "./pages/LoginPage";
+import SignUpPage from "./pages/SignUpPage";
+import { useAuthStore } from "./store/useAuthStore";
+import { useEffect } from "react";
+import PageLoader from "./components/PageLoader";
+import { Toaster } from "react-hot-toast";
+ 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const { checkAuth, isCheckingAuth, authUser } = useAuthStore();
+ 
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+ 
+  if (isCheckingAuth) return <PageLoader />;
+ 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden"
+      style={{ background: "#0a0617" }}
+    >
+      {/* Grid texture */}
+      <div className="absolute inset-0"
+        style={{
+          backgroundImage: "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+ 
+      {/* Ambient orb — violet top left */}
+      <div className="absolute pointer-events-none"
+        style={{
+          top: "-10%", left: "-10%",
+          width: "600px", height: "600px",
+          background: "radial-gradient(circle, rgba(109,40,217,0.25) 0%, transparent 70%)",
+          borderRadius: "50%",
+        }}
+      />
+ 
+      {/* Ambient orb — gold bottom right */}
+      <div className="absolute pointer-events-none"
+        style={{
+          bottom: "-10%", right: "-10%",
+          width: "500px", height: "500px",
+          background: "radial-gradient(circle, rgba(196,153,42,0.15) 0%, transparent 70%)",
+          borderRadius: "50%",
+        }}
+      />
+ 
+      {/* Ambient orb — violet center */}
+      <div className="absolute pointer-events-none"
+        style={{
+          top: "40%", left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "400px", height: "400px",
+          background: "radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%)",
+          borderRadius: "50%",
+        }}
+      />
+ 
+      <Routes>
+        <Route path="/" element={authUser ? <ChatPage /> : <Navigate to={"/login"} />} />
+        <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to={"/"} />} />
+        <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to={"/"} />} />
+      </Routes>
+ 
+      <Toaster
+        toastOptions={{
+          style: {
+            background: "#1a1030",
+            color: "#e8e0ff",
+            border: "1px solid #2e2250",
+          },
+        }}
+      />
+    </div>
+  );
 }
-
-export default App
+ 
+export default App;
