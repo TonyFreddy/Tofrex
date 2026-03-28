@@ -10,10 +10,12 @@ const generateToken = (userId, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
     sameSite: "strict",
-    secure: ENV.NODE_ENV !== "development",
+   secure: false,
   });
 
   return token;
 };
 
 module.exports = { generateToken };
+
+//   secure: ENV.NODE_ENV !== "development",
