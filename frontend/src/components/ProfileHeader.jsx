@@ -1,7 +1,8 @@
 import { useState, useRef } from "react";
-import { LogOutIcon, VolumeOffIcon, Volume2Icon } from "lucide-react";
+import { LogOutIcon, VolumeOffIcon, Volume2Icon, HomeIcon } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useChatStore } from "../store/useChatStore";
+import { Link } from "react-router";
 
 const mouseClickSound = new Audio("/sounds/mouse-click.mp3");
 
@@ -42,12 +43,15 @@ function ProfileHeader() {
           </div>
         </div>
         <div className="flex gap-4 items-center">
+          <Link to="/" className="text-slate-400 hover:text-slate-200 transition-colors">
+            <HomeIcon className="size-5" />
+          </Link>
           <button className="text-slate-400 hover:text-slate-200 transition-colors" onClick={logout}>
             <LogOutIcon className="size-5" />
           </button>
           <button className="text-slate-400 hover:text-slate-200 transition-colors" onClick={() => {
             mouseClickSound.currentTime = 0;
-            mouseClickSound.play().catch((error) => console.log("Audio play failed:", error));
+            mouseClickSound.play().catch((e) => console.log("Audio play failed:", e));
             toggleSound();
           }}>
             {isSoundEnabled ? <Volume2Icon className="size-5" /> : <VolumeOffIcon className="size-5" />}
@@ -57,4 +61,5 @@ function ProfileHeader() {
     </div>
   );
 }
+
 export default ProfileHeader;

@@ -72,7 +72,10 @@ export const useChatStore = create((set, get) => ({
     };
     set({ messages: [...messages, optimisticMessage] });
     try {
-      const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
+      const res = await axiosInstance.post(
+        `/messages/send/${selectedUser._id}`,
+        messageData
+      );
       set({ messages: messages.concat(res.data) });
     } catch (error) {
       set({ messages: messages });
@@ -85,14 +88,17 @@ export const useChatStore = create((set, get) => ({
     if (!selectedUser) return;
     const socket = useAuthStore.getState().socket;
     socket.on("newMessage", (newMessage) => {
-      const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
+      const isMessageSentFromSelectedUser =
+        newMessage.senderId === selectedUser._id;
       if (!isMessageSentFromSelectedUser) return;
       const currentMessages = get().messages;
       set({ messages: [...currentMessages, newMessage] });
       if (isSoundEnabled) {
         const notificationSound = new Audio("/sounds/notification.mp3");
         notificationSound.currentTime = 0;
-        notificationSound.play().catch((e) => console.log("Audio play failed:", e));
+        notificationSound
+          .play()
+          .catch((e) => console.log("Audio play failed:", e));
       }
     });
   },
