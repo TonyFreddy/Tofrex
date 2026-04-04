@@ -11,9 +11,6 @@ const { app, server }    = require("./lib/socket");
 
 const PORT = ENV.PORT || 5000;
 
-
-app.use("/api/subscriptions/webhook", express.raw({ type: "application/json" }));
-
 app.use(express.json({ limit: "50mb" }));
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
 app.use(cookieParser());

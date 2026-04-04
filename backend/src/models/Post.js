@@ -6,6 +6,7 @@ const postSchema = new mongoose.Schema({
   mediaUrl:  { type: String, required: true },
   mediaType: { type: String, enum: ["image", "video"], required: true },
   isPremium: { type: Boolean, default: true },
+  likes:     [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 }, { timestamps: true });
 
 module.exports = mongoose.model("Post", postSchema);

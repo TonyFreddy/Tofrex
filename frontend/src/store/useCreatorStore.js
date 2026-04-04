@@ -3,37 +3,72 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 
 export const useCreatorStore = create((set) => ({
-  creator: null,
-  posts: [],
-  isSubscribed: false,
-  isOwner: false,
-  isLoading: false,
+  creators:       [],
+  creator:        null,
+  posts:          [],
+  isSubscribed:   false,
+  isOwner:        false,
+  subscriberCount:0,
+  isLoading:      false,
+  feed:           [],
+  notifications:  [],
+  unreadNotifs:   0,
+
+  fetchFeed: async () => {
+    set({ isLoading: true });
+    try {
+      const res = await axiosInstance.get("/creators/feed");
+      set({ feed: res.data });
+    } catch { toast.error("Erreur chargement feed"); }
+    finally { set({ isLoading: false }); }
+  },
+
+  fetchAllCreators: async () => {
+    set({ isLoading: true });
+    try {
+      const res = await axiosInstance.get("/creators");
+      set({ creators: res.data });
+    } catch { toast.error("Erreur chargement créateurs"); }
+    finally { set({ isLoading: false }); }
+  },
 
   fetchCreatorProfile: async (creatorId) => {
     set({ isLoading: true });
     try {
       const res = await axiosInstance.get(`/creators/${creatorId}`);
       set({
-        creator:      res.data.creator,
-        posts:        res.data.posts,
-        isSubscribed: res.data.isSubscribed,
-        isOwner:      res.data.isOwner,
+        creator:         res.data.creator,
+        posts:           res.data.posts,
+        isSubscribed:    res.data.isSubscribed,
+        isOwner:         res.data.isOwner,
+        subscriberCount: res.data.subscriberCount,
       });
-    } catch (err) {
-      console.error("fetchCreatorProfile:", err);
-      toast.error("Impossible de charger le profil");
-    } finally {
-      set({ isLoading: false });
-    }
+    } catch { toast.error("Erreur chargement profil"); }
+    finally { set({ isLoading: false }); }
   },
 
-  becomeCreator: async (formData) => {
-    const res = await axiosInstance.post("/creators/become", formData);
+  fetchNotifications: async () => {
+    try {
+      const res = await axiosInstance.get("/creators/notifications");
+      const unread = res.data.filter((n) => !n.read).length;
+      set({ notifications: res.data, unreadNotifs: unread });
+    } catch { /* ignore */ }
+  },
+
+  markNotifsRead: async () => {
+    try {
+      await axiosInstance.put("/creators/notifications/read");
+      set((s) => ({ notifications: s.notifications.map((n) => ({ ...n, read: true })), unreadNotifs: 0 }));
+    } catch { /* ignore */ }
+  },
+
+  becomeCreator: async (data) => {
+    const res = await axiosInstance.post("/creators/become", data);
     return res.data;
   },
 
-  updateCreatorProfile: async (profileData) => {
-    const res = await axiosInstance.put("/creators/profile", profileData);
+  updateCreatorProfile: async (data) => {
+    const res = await axiosInstance.put("/creators/profile", data);
     set((s) => ({ creator: { ...s.creator, ...res.data.creator } }));
     return res.data;
   },
@@ -49,18 +84,14 @@ export const useCreatorStore = create((set) => ({
     set((s) => ({ posts: s.posts.filter((p) => p._id !== postId) }));
   },
 
-  subscribeToCreator: async (creatorId) => {
-    const res = await axiosInstance.post(`/subscriptions/subscribe/${creatorId}`);
-    window.location.href = res.data.url;
+  verifySubscription: async (creatorId, transactionId) => {
+    const res = await axiosInstance.post(`/subscriptions/subscribe/${creatorId}`, { transactionId });
+    set({ isSubscribed: true });
+    return res.data;
   },
 
-  sendTip: async (creatorId, amount, message) => {
-    const res = await axiosInstance.post(`/subscriptions/tip/${creatorId}`, { amount, message });
-    window.location.href = res.data.url;
-  },
-
-  getMySubscriptions: async () => {
-    const res = await axiosInstance.get("/subscriptions/my");
+  verifyTip: async (creatorId, transactionId, message) => {
+    const res = await axiosInstance.post(`/subscriptions/tip/${creatorId}`, { transactionId, message });
     return res.data;
   },
 
